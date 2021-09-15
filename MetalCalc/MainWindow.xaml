@@ -65,7 +65,18 @@
             <Border>
                 <WrapPanel>
                     <TextBlock>Вид охлаждения</TextBlock>
-                    <ComboBox></ComboBox>
+                    <ComboBox SelectedIndex="0" Name="CoolingTypeSelector">
+                        <ComboBoxItem Name="NoCooling">Охлаждение отсувствует</ComboBoxItem>
+                        <ComboBoxItem Name="Oil_Grinding">Охлаждение маслом(при шлифофании)</ComboBoxItem>
+                        <ComboBoxItem Name="Emuls_Grinding_Less_3">Охлаждение эмульсией с соединением эмульсона менее 3%(при шлифовании)</ComboBoxItem>
+                        <ComboBoxItem Name="Emuls_Grinding_Less_3_10">Охлаждение эмульсией с соединением эмульсона менее 3-10%(при шлифовании)</ComboBoxItem>
+                        
+                        <ComboBoxItem Name="Oil_NotGrinding">Охлаждение маслом(не при шлифофании)</ComboBoxItem>
+                        <ComboBoxItem Name="Emuls_NotGrinding_Less_3">Охлаждение эмульсией с соединением эмульсона менее 3%(не при шлифовании)</ComboBoxItem>
+                        <ComboBoxItem Name="Emuls_NotGrinding_Less_3_10">Охлаждение эмульсией с соединением эмульсона менее 3-10%(не при шлифовании)</ComboBoxItem>
+
+                        <ComboBoxItem Name="Water">Охлаждение водой</ComboBoxItem>
+                    </ComboBox>
                 </WrapPanel>
             </Border>
             <Border>

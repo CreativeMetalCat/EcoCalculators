@@ -28,7 +28,23 @@ namespace MetalCalc
             FromSource
         }
 
+        protected enum CoolingType
+        {
+            NoCooling,
+            Oil_Grinding,
+            Emuls_Grinding_Less_3,
+            Emuls_Grinding_Less_3_10,
+            Oil_NotGrinding,
+            Emuls_NotGrinding_Less_3,
+            Emuls_NotGrinding_Less_3_10,
+            Water
+        }
+        //СОЖ
+        protected Dictionary<string, float> SOJEmit = new Dictionary<string, float>();
+
         protected ReportType reportType;
+
+        protected CoolingType coolingType;
 
         protected ElementDataStorage elementData;
 
@@ -51,6 +67,11 @@ namespace MetalCalc
             {
                 Machines.SelectedIndex = 0;
             }
+        }
+
+        protected void LoadSojData(string file = "./soj.csv")
+        {
+            //this is more of a test function
         }
 
         public MainWindow()
@@ -88,11 +109,22 @@ namespace MetalCalc
 
                 int T = Convert.ToInt32(TimePerYear_Text.Text);
 
+                //мощность станка
+                float N = coolingType == CoolingType.NoCooling ? 1 : (float)Convert.ToDouble(Power);
+
                 if(ReportTypeSelector.SelectedItem is ComboBoxItem item)
                 {
                     if(!Enum.TryParse<ReportType>(item.Name, out reportType))
                     {
-                        throw new Exception("Ошибка в выборе вида отчета.\n Unable to parse report name");
+                        throw new Exception("Ошибка в выборе вида отчета.\n Unable to parse report name. Please check for naming errors");
+                    }
+                }
+
+                if(CoolingTypeSelector.SelectedItem is ComboBoxItem itemc)
+                {
+                    if(!Enum.TryParse<CoolingType>(itemc.Name,out coolingType))
+                    {
+                        throw new Exception("Ошибка в выборе типа охлаждения.\n Unable to parse cooling type name. Please check for naming errors");
                     }
                 }
 
@@ -122,17 +154,16 @@ namespace MetalCalc
                             K0 = 1 - (float)Convert.ToDouble(LocalSuckEfficiency.Text);
                             break;
                     }
-
                     //степень очистки воздуха
                     float j = 0;
 
                     //расчет выброса пыли
-                    float Mv = n * kGrav * q * K0 * t / 1200;
+                    float Mv = n * kGrav * q * K0 * t / 1200 * N;
 
                     float Muog = Mv * (1 - j);
 
                     //валовый выброс
-                    float Mgv = 3.6f * n * q * kGrav * K0 * T * 0.001f;
+                    float Mgv = 3.6f * n * q * kGrav * K0 * T * 0.001f * N;
                     float Moug = Mgv * (1 - j);
 
                     res.Add($"Мв = {Math.Round(Mv, 7)}, МвУОГ = {Math.Round(Muog, 7)},МвГ = {Math.Round(Mgv, 7)}, МвГУОГ = {Math.Round(Moug, 7)}");
