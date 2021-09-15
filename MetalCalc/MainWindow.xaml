@@ -1,0 +1,101 @@
+﻿<Window x:Class="MetalCalc.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MetalCalc"
+        mc:Ignorable="d"
+        Title="Расчет источников выделений" Height="500" Width="400">
+    <Grid>
+        <StackPanel Margin="0,19,0,0" >
+            <TextBlock>Процесс:</TextBlock>
+            <ComboBox Name="Operation" SelectionChanged="Operation_SelectionChanged">
+                <ComboBoxItem Name="Mechanical">Механическая обработка металлов</ComboBoxItem>
+                <ComboBoxItem Name="MechanicalGalvan">Механическая обработка металлов в гальваническом производстве</ComboBoxItem>
+                <ComboBoxItem Name="Abras">Абразивная заточка режущего инструмента</ComboBoxItem>
+                <ComboBoxItem Name="Chugun">Механическая обработка чугуна и цветных металлов</ComboBoxItem>
+                <ComboBoxItem Name="Electroerros">Обработка на электроэррозионных станках</ComboBoxItem>
+                <ComboBoxItem Name="PVH">Производство пластиковых окон из поливинилхлорида(ПВХ)</ComboBoxItem>
+                <ComboBoxItem Name="Graphit">Механическая обработка графита</ComboBoxItem>
+                <ComboBoxItem Name="MechNonMetal">Механическая обработка нематаллических материалов</ComboBoxItem>
+                <ComboBoxItem Name="Wood">Заточка древорежущего материала</ComboBoxItem>
+                <ComboBoxItem Name="Peskostroy">Пескоструйной обработки</ComboBoxItem>
+            </ComboBox>
+            <TextBlock>Вид оборудования</TextBlock>
+            <ComboBox Name ="Machines">
+            </ComboBox>
+            <WrapPanel>
+                <TextBlock>Состав металлической пыли</TextBlock>
+                <StackPanel>
+                    <RadioButton>
+                        Конкретные в-ва
+                    </RadioButton>
+                    <RadioButton>
+                        Взвешенные в-ва
+                    </RadioButton>
+                </StackPanel>
+            </WrapPanel>
+            <Border Width="329">
+                <StackPanel>
+                    <WrapPanel>
+                        <TextBlock>Кол-во раб мест</TextBlock>
+                        <TextBox Width="116" Name="WorkplaceCount" PreviewTextInput="TextboxNumCheck_PreviewTextInput">1</TextBox>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock>Время работы станка(за год)</TextBlock>
+                        <TextBox Width="116" Name ="TimePerYear_Text" PreviewTextInput="TextboxNumCheck_PreviewTextInput">50</TextBox>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock>Мощность станка</TextBlock>
+                        <TextBox Width="116" Name ="Power" PreviewTextInput="TextboxNumCheck_PreviewTextInput">1</TextBox>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock>Наличие в СОЖ триантелномина</TextBlock>
+                        <StackPanel>
+                            <RadioButton>
+                                Содержит
+                            </RadioButton>
+                            <RadioButton>
+                                Не содержит
+                            </RadioButton>
+                        </StackPanel>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+            <Border>
+                <WrapPanel>
+                    <TextBlock>Вид охлаждения</TextBlock>
+                    <ComboBox></ComboBox>
+                </WrapPanel>
+            </Border>
+            <Border>
+                <WrapPanel>
+                    <TextBlock>Продолжительность произв цикла</TextBlock>
+                    <TextBox Width="116" Name="CycleLenght_Text"  PreviewTextInput="TextboxNumCheck_PreviewTextInput">1</TextBox>
+                </WrapPanel>
+            </Border>
+            <Border>
+                <StackPanel>
+                    <TextBlock>Вид отчета</TextBlock>
+                    <ComboBox Name="ReportTypeSelector" SelectedIndex="0">
+                        <ComboBoxItem Name="NoSuck">Отчет при отсутствии местных отсосов</ComboBoxItem>
+                        <ComboBoxItem Name="Report_Full">Полный отчет</ComboBoxItem>
+                        <ComboBoxItem Name="FromRoom">
+                            <TextBlock TextWrapping="WrapWithOverflow">Расчет части выбросовбпоступающей в атмосферный воздух из помещения в котором проводятся работы</TextBlock>
+                        </ComboBoxItem>
+                        <ComboBoxItem Name="FromSource">
+                            <TextBlock TextWrapping="WrapWithOverflow">Расчет части выбросовбпоступающей в атмосферный воздух из организованного источника</TextBlock>
+                        </ComboBoxItem>
+                    </ComboBox>
+                    <Border>
+                        <WrapPanel>
+                            <TextBlock>Эффективность местных отсосов</TextBlock>
+                            <TextBox Name="LocalSuckEfficiency" PreviewTextInput="TextboxNumCheck_PreviewTextInput" Width="140">0.8</TextBox>
+                        </WrapPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Button Name="Calc" Click="Calc_Click">Подсчет</Button>
+        </StackPanel>
+    </Grid>
+</Window>
