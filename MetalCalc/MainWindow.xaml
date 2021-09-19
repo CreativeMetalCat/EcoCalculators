@@ -90,7 +90,7 @@
                     <TextBlock>Вид отчета</TextBlock>
                     <ComboBox Name="ReportTypeSelector" SelectedIndex="0">
                         <ComboBoxItem Name="NoSuck">Отчет при отсутствии местных отсосов</ComboBoxItem>
-                        <ComboBoxItem Name="Report_Full">Полный отчет</ComboBoxItem>
+                        <ComboBoxItem Name="Full">Полный отчет</ComboBoxItem>
                         <ComboBoxItem Name="FromRoom">
                             <TextBlock TextWrapping="WrapWithOverflow">Расчет части выбросовбпоступающей в атмосферный воздух из помещения в котором проводятся работы</TextBlock>
                         </ComboBoxItem>

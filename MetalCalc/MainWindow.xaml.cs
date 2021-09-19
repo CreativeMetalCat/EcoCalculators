@@ -40,7 +40,7 @@ namespace MetalCalc
             Water
         }
         //СОЖ
-        protected Dictionary<string, float> SOJEmit = new Dictionary<string, float>();
+        protected System.Collections.Generic.List<Element> SOJ = new List<Element>();
 
         protected ReportType reportType;
 
@@ -72,6 +72,13 @@ namespace MetalCalc
         protected void LoadSojData(string file = "./soj.csv")
         {
             //this is more of a test function
+            var lines = System.IO.File.ReadAllLines(file);
+            foreach(var line in lines)
+            {
+                var data = line.Split(';');
+                SOJ.Add(new Element(Convert.ToInt32(data[0], System.Globalization.CultureInfo.InvariantCulture),data[2], (float)Convert.ToDouble(data[3], System.Globalization.CultureInfo.InvariantCulture)));
+                SOJ.Last<Element>().SimpleName = data[1];
+            }
         }
 
         public MainWindow()
@@ -88,6 +95,47 @@ namespace MetalCalc
 
             //заполнить список обородувания на основе данных из таблицы
             Machines.ItemsSource = machines;
+
+            LoadSojData();
+        }
+
+        private void calculateEmit(float q,int n,int t,float N,int T,int elemCode,string name,StringBuilder resultCSV)
+        {
+            //записать значения из тиблиц на основе введеных данных
+            //удельное выделение i-го загрязняющего в-ва
+            //берется из таблицы
+
+            //поправочный коэф
+            //берется на основе оборудования
+            //Для металлической и абразивной пыли 0.2, для других твердых компонентов (и компонентов СОЖ) 0.4
+            float kGrav = 0.2f;
+
+            float K0 = 1;
+            switch (reportType)
+            {
+                case ReportType.NoSuck:
+                    K0 = 1;
+                    break;
+                case ReportType.Full:
+                    K0 = (float)Convert.ToDouble(LocalSuckEfficiency.Text, System.Globalization.CultureInfo.InvariantCulture);
+                    break;
+                case ReportType.FromRoom:
+                    K0 = 1 - (float)Convert.ToDouble(LocalSuckEfficiency.Text, System.Globalization.CultureInfo.InvariantCulture);
+                    break;
+            }
+            //степень очистки воздуха
+            float j = 0;
+
+            //расчет выброса пыли
+            float Mv = n * kGrav * q * K0 * t / 1200 * N;
+
+            float Muog = Mv * (1 - j);
+
+            //валовый выброс
+            float Mgv = 3.6f * n * q * kGrav * K0 * T * 0.001f * N;
+            float Moug = Mgv * (1 - j);
+
+            resultCSV.AppendLine($"{elemCode};{name};{Math.Round(Mv, 7)};{Math.Round(Mgv, 7)};{j};{Math.Round(Muog, 7)};{Math.Round(Moug, 7)}");
         }
 
         private void Calc_Click(object sender, RoutedEventArgs e)
@@ -110,7 +158,7 @@ namespace MetalCalc
                 int T = Convert.ToInt32(TimePerYear_Text.Text);
 
                 //мощность станка
-                float N = coolingType == CoolingType.NoCooling ? 1 : (float)Convert.ToDouble(Power);
+                float N = coolingType == CoolingType.NoCooling ? 1 : (float)Convert.ToDouble(Power.ToString(), System.Globalization.CultureInfo.InvariantCulture);
 
                 if(ReportTypeSelector.SelectedItem is ComboBoxItem item)
                 {
@@ -127,57 +175,37 @@ namespace MetalCalc
                         throw new Exception("Ошибка в выборе типа охлаждения.\n Unable to parse cooling type name. Please check for naming errors");
                     }
                 }
-
                 //высчитать для каждого типа пыли
                 foreach (var dust in machine.DustTypes)
                 {
-                    //записать значения из тиблиц на основе введеных данных
-                    //удельное выделение i-го загрязняющего в-ва
-                    //берется из таблицы
-                    float q = dust.Value;
-
-                    //поправочный коэф
-                    //берется на основе оборудования
-                    //Для металлической и абразивной пыли 0.2, для других твердых компонентов (и компонентов СОЖ) 0.4
-                    float kGrav = 0.2f;
-
-                    float K0 = 1;
-                    switch (reportType)
+                    calculateEmit(0.2f, n, t, N, T, dust.Key, elementData.Elements[dust.Key].Name, csv);
+                }
+                if(coolingType != CoolingType.Water &&  coolingType != CoolingType.NoCooling)
+                {
+                    string name = (CoolingTypeSelector.SelectedItem as ComboBoxItem).Content.ToString();
+                    foreach (var soj in SOJ)
                     {
-                        case ReportType.NoSuck:
-                            K0 = 1;
+                        if(soj.Name == name)
+                        {
+                            calculateEmit(soj.AirQualityStandart, n, t, N, T, soj.Code, soj.SimpleName, csv);
                             break;
-                        case ReportType.Full:
-                            K0 = (float)Convert.ToDouble(LocalSuckEfficiency.Text);
-                            break;
-                        case ReportType.FromRoom:
-                            K0 = 1 - (float)Convert.ToDouble(LocalSuckEfficiency.Text);
-                            break;
+                        }
+                        /*else
+                        {
+                            MessageBox.Show($"Soj name : {soj.Name}; name : {name}");
+                        }*/
                     }
-                    //степень очистки воздуха
-                    float j = 0;
 
-                    //расчет выброса пыли
-                    float Mv = n * kGrav * q * K0 * t / 1200 * N;
-
-                    float Muog = Mv * (1 - j);
-
-                    //валовый выброс
-                    float Mgv = 3.6f * n * q * kGrav * K0 * T * 0.001f * N;
-                    float Moug = Mgv * (1 - j);
-
-                    res.Add($"Мв = {Math.Round(Mv, 7)}, МвУОГ = {Math.Round(Muog, 7)},МвГ = {Math.Round(Mgv, 7)}, МвГУОГ = {Math.Round(Moug, 7)}");
-                    csv.AppendLine($"{dust.Key};{elementData.Elements[dust.Key].Name};{Math.Round(Mv, 7)};{Math.Round(Mgv, 7)};{j};{Math.Round(Muog, 7)};{Math.Round(Moug, 7)}");
                 }
                 string operationName = (Operation.SelectedItem as ComboBoxItem).Content.ToString();
                 csv.AppendLine();
                 csv.AppendLine($"Технологическая операция: ;{operationName}");
                 csv.AppendLine($"Вид оборудования: ;{machine.Name}");
-                csv.AppendLine($"Тип охлаждения: ;##$#%%&^&(^*&{machine.Name}");
                 csv.AppendLine($"Кол-во станков: ;{n}");
                 csv.AppendLine($"Время работы станка за год (T): ;{T}");          
                 csv.AppendLine($"Продолжительность производственного цикла (ti): : ;{t}(сек)/{t / 60f}(мин)");
-                csv.AppendLine($"Тип отчета : ;{(ReportTypeSelector.SelectedItem as ComboBoxItem).Content}");
+                csv.AppendLine($"Тип отчета : ;{(ReportTypeSelector.SelectedItem as ComboBoxItem).Content.ToString()}");
+                csv.AppendLine($"Тип охлаждения : ;{(CoolingTypeSelector.SelectedItem as ComboBoxItem).Content.ToString()}");
                 System.IO.File.WriteAllText($"./calc_{operationName}_{DateTime.Now.ToFileTime()}.csv", csv.ToString(), Encoding.UTF8);            
             }
         }
