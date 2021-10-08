@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MetalCalc"
         mc:Ignorable="d"
-        Title="Расчет источников выделений" Height="500" Width="400">
+        Title="Расчет источников выделений" Height="700" Width="600"
+        FontSize="20">
     <Grid>
-        <StackPanel Margin="0,19,0,0" >
+        <StackPanel Margin="0,0,0,0" >
             <TextBlock>Процесс:</TextBlock>
             <ComboBox Name="Operation" SelectionChanged="Operation_SelectionChanged">
                 <ComboBoxItem Name="Mechanical">Механическая обработка металлов</ComboBoxItem>
@@ -30,9 +31,29 @@
                     <RadioButton>
                         Конкретные в-ва
                     </RadioButton>
+
                     <RadioButton>
                         Взвешенные в-ва
                     </RadioButton>
+                </StackPanel>
+                
+                
+
+            </WrapPanel>
+            <TextBlock>Взвешенное вещество:</TextBlock>
+            <WrapPanel>
+
+                <TextBlock>Кграв =</TextBlock>
+                <TextBox Width="87"></TextBox>
+                <TextBlock>Код вещества</TextBlock>
+                <TextBox Width="117"></TextBox>
+            </WrapPanel>
+            <WrapPanel>
+                <StackPanel>
+                    <TextBlock>Конкретное вещество :</TextBlock>
+                    <ComboBox Name="elems">
+
+                    </ComboBox>
                 </StackPanel>
             </WrapPanel>
             <Border Width="329">
@@ -47,18 +68,15 @@
                     </WrapPanel>
                     <WrapPanel>
                         <TextBlock>Мощность станка</TextBlock>
-                        <TextBox Width="116" Name ="Power" PreviewTextInput="TextboxNumCheck_PreviewTextInput">1</TextBox>
+                        <TextBox Width="116" Name ="Power" PreviewTextInput="TextboxNumCheck_PreviewTextInput">1.0</TextBox>
                     </WrapPanel>
                     <WrapPanel>
                         <TextBlock>Наличие в СОЖ триантелномина</TextBlock>
-                        <StackPanel>
-                            <RadioButton>
-                                Содержит
-                            </RadioButton>
-                            <RadioButton>
-                                Не содержит
-                            </RadioButton>
-                        </StackPanel>
+                        <ComboBox Name="Trian" SelectedIndex="0">
+                            <ComboBoxItem>Не Содержит</ComboBoxItem>
+                            <ComboBoxItem>Содержит</ComboBoxItem>
+                            
+                        </ComboBox>
                     </WrapPanel>
                 </StackPanel>
             </Border>
@@ -66,11 +84,11 @@
                 <WrapPanel>
                     <TextBlock>Вид охлаждения</TextBlock>
                     <ComboBox SelectedIndex="0" Name="CoolingTypeSelector">
-                        <ComboBoxItem Name="NoCooling">Охлаждение отсувствует</ComboBoxItem>
+                        <ComboBoxItem Name="NoCooling">Охлаждение отсутствует</ComboBoxItem>
                         <ComboBoxItem Name="Oil_Grinding">Охлаждение маслом(при шлифофании)</ComboBoxItem>
                         <ComboBoxItem Name="Emuls_Grinding_Less_3">Охлаждение эмульсией с соединением эмульсона менее 3%(при шлифовании)</ComboBoxItem>
                         <ComboBoxItem Name="Emuls_Grinding_Less_3_10">Охлаждение эмульсией с соединением эмульсона менее 3-10%(при шлифовании)</ComboBoxItem>
-                        
+
                         <ComboBoxItem Name="Oil_NotGrinding">Охлаждение маслом(не при шлифофании)</ComboBoxItem>
                         <ComboBoxItem Name="Emuls_NotGrinding_Less_3">Охлаждение эмульсией с соединением эмульсона менее 3%(не при шлифовании)</ComboBoxItem>
                         <ComboBoxItem Name="Emuls_NotGrinding_Less_3_10">Охлаждение эмульсией с соединением эмульсона менее 3-10%(не при шлифовании)</ComboBoxItem>
@@ -81,7 +99,7 @@
             </Border>
             <Border>
                 <WrapPanel>
-                    <TextBlock>Продолжительность произв цикла</TextBlock>
+                    <TextBlock>Продолжительность произв цикла(мин)</TextBlock>
                     <TextBox Width="116" Name="CycleLenght_Text"  PreviewTextInput="TextboxNumCheck_PreviewTextInput">1</TextBox>
                 </WrapPanel>
             </Border>
@@ -101,12 +119,15 @@
                     <Border>
                         <WrapPanel>
                             <TextBlock>Эффективность местных отсосов</TextBlock>
-                            <TextBox Name="LocalSuckEfficiency" PreviewTextInput="TextboxNumCheck_PreviewTextInput" Width="140">0.8</TextBox>
+                            <TextBox Name="LocalSuckEfficiency" Width="140">0.8</TextBox>
                         </WrapPanel>
                     </Border>
                 </StackPanel>
             </Border>
-            <Button Name="Calc" Click="Calc_Click">Подсчет</Button>
+            <StackPanel >
+                <Button Name="Calc" Click="Calc_Click">Подсчет</Button>
+                <Button Name="Preview" Click="Preview_Click">Предварительный просмотр</Button>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

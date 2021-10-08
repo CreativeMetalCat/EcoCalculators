@@ -19,7 +19,7 @@ namespace MetalCalc
 
         //выделяющиеся в атмосферу вредные в-ва
 
-        public Dictionary<int, float> DustTypes = new Dictionary<int, float>();
+        public Dictionary<string, float> DustTypes = new Dictionary<string, float>();
 
         public Machine(string name, string actionType)
         {
@@ -29,7 +29,7 @@ namespace MetalCalc
 
         public override string ToString()
         {
-            return $"{Name} ({DefiningCharacteristic})";
+            return $"{Name}";
         }
     }
 
@@ -63,11 +63,12 @@ namespace MetalCalc
                 while (i < bytes.Count)
                 {
                     try
-                    {/*
-                     * name is the first entry in the line
-                     * special info is the second
-                     * rest are dust types
-                     */
+                    {
+                        /*
+                         * name is the first entry in the line
+                         * special info is the second
+                         * rest are dust types
+                         */
                         List<byte> name = new List<byte>();
                         List<byte> dat = new List<byte>();
                         while (bytes[i] != 0x3B)
@@ -84,50 +85,60 @@ namespace MetalCalc
                         }
                         //move past ";"
                         i++;
-                        Machines.Add(new Machine($"{System.Text.Encoding.UTF8.GetString(name.ToArray()) } (D = {System.Text.Encoding.UTF8.GetString(dat.ToArray())})мм", "Механическая обработка металлов"));
-                        Machines.Last().DustTypes.Add(0123, 0.004f);
-                        Machines.Last().DustTypes.Add(2930, 0.006f);
+                        //yeah i could have used ternary 
+                        if (dat.Count > 0)
+                        {
+                            Machines.Add(new Machine($"{System.Text.Encoding.UTF8.GetString(name.ToArray()) } (D = {System.Text.Encoding.UTF8.GetString(dat.ToArray())})мм", "Механическая обработка металлов"));
+                        }
+                        else
+                        {
+                            Machines.Add(new Machine($"{System.Text.Encoding.UTF8.GetString(name.ToArray()) }", "Механическая обработка металлов"));
+                        }
+                        //not the pretties way but this way we can convert row id to element code via simle switch
+                        int row = 0;
+
+                        //Machines.Last().DustTypes.Add(2930, 0.006f);
                         while (bytes[i] != 0x0D && bytes[i + 1] != 0x0A)
                         {
+                            List<byte> value = new List<byte>();
                             //read line bytes
-                            if (bytes[i] == 0x3B/*0x3B is ;*/)
+                            while (bytes[i] != 0x3B/*0x3B is ;*/)
                             {
-
+                                value.Add(bytes[i]);
+                                i++;
                             }
+                            if (value.Count > 0)
+                            {
+                                string code = "2930";
+                                switch (row)
+                                {
+                                    case 1:
+                                        code = "0123";
+                                        break;
+                                    case 2:
+                                        code = "2917";
+                                        break;
+                                    case 3:
+                                        code = "0228";
+                                        break;
+                                }
+                                Machines.Last().DustTypes.Add(code, (float)Convert.ToDouble(System.Text.Encoding.UTF8.GetString(value.ToArray()), System.Globalization.CultureInfo.InvariantCulture));
+                            }
+                            row++;
                             i++;
                         }
                         i++;
                     }
-                    catch(System.IndexOutOfRangeException)
+                    catch (System.IndexOutOfRangeException)
                     {
                         break;
                     }
-                    catch(System.ArgumentOutOfRangeException)
+                    catch (System.ArgumentOutOfRangeException)
                     {
                         break;
                     }
                 }
             }
-
-            /*Machines.Add(new Machine("Заточные Станки", 100, "Механическая обработка металлов"));
-            Machines.Last().DustTypes.Add(0123, 0.004f);
-            Machines.Last().DustTypes.Add(2930, 0.006f);
-
-            Machines.Add(new Machine("Заточные Станки", 150, "Механическая обработка металлов"));
-            Machines.Last().DustTypes.Add(0123, 0.006f);
-            Machines.Last().DustTypes.Add(2930, 0.008f);
-
-            Machines.Add(new Machine("Заточные Станки", 200, "Механическая обработка металлов"));
-            Machines.Last().DustTypes.Add(0123, 0.008f);
-            Machines.Last().DustTypes.Add(2930, 0.012f);
-
-            Machines.Add(new Machine("Заточные Станки", 250, "Механическая обработка металлов"));
-            Machines.Last().DustTypes.Add(0123, 0.011f);
-            Machines.Last().DustTypes.Add(2930, 0.016f);
-
-            Machines.Add(new Machine("Заточные Станки", 300, "Механическая обработка металлов"));
-            Machines.Last().DustTypes.Add(0123, 0.013f);
-            Machines.Last().DustTypes.Add(2930, 0.021f);*/
         }
     }
 
